@@ -30,7 +30,9 @@ class ModelTrainingRunner:
         self.trainer_outputs_: list[Any] = []
         self.last_report_: pd.Series | pd.DataFrame | None = None
         self._log = logging.getLogger(type(self).__name__)
-        self._log.info(f"Initialized with {len(self.trainers)} trainer(s) and {len(self.evaluators)} evaluators")
+        self._log.info(
+            f"Initialized with {len(self.trainers)} trainer(s) and {len(self.evaluators)} evaluators"
+        )
 
     @classmethod
     def from_cfg(
@@ -41,10 +43,14 @@ class ModelTrainingRunner:
         evaluators: Registry,
     ) -> ModelTrainingRunner:
         trainer_cfgs = cfg.get("trainers") or []
-        built_trainers = [trainers.create(t["name"], **t.get("kwargs", {})) for t in trainer_cfgs]
+        built_trainers = [
+            trainers.create(t["name"], **t.get("kwargs", {})) for t in trainer_cfgs
+        ]
 
         evaluator_cfgs = cfg.get("evaluators") or []
-        built_evaluators = [evaluators.create(e["name"], **e.get("kwargs", {})) for e in evaluator_cfgs]
+        built_evaluators = [
+            evaluators.create(e["name"], **e.get("kwargs", {})) for e in evaluator_cfgs
+        ]
 
         return cls(trainers=built_trainers, evaluators=built_evaluators, config=cfg)
 
@@ -55,11 +61,15 @@ class ModelTrainingRunner:
         cfg: dict[str, Any] = {"trainers": [], "evaluators": []}
         for t in self.trainers:
             cfg["trainers"].append(
-                t.to_config() if hasattr(t, "to_config") else {"name": type(t).__name__, "kwargs": {}}
+                t.to_config()
+                if hasattr(t, "to_config")
+                else {"name": type(t).__name__, "kwargs": {}}
             )
         for e in self.evaluators:
             cfg["evaluators"].append(
-                e.to_config() if hasattr(e, "to_config") else {"name": type(e).__name__, "kwargs": {}}
+                e.to_config()
+                if hasattr(e, "to_config")
+                else {"name": type(e).__name__, "kwargs": {}}
             )
         return cfg
 
@@ -80,11 +90,15 @@ class ModelTrainingRunner:
         if self.model_ is None:
             raise RuntimeError("Runner not fitted. Call fit() first.")
         last_trainer = self.trainers[-1] if self.trainers else None
-        if last_trainer is not None and callable(getattr(last_trainer, "predict", None)):
+        if last_trainer is not None and callable(
+            getattr(last_trainer, "predict", None)
+        ):
             return last_trainer.predict(X, **kwargs)
         raise AttributeError("No predict() available on last trainer.")
 
-    def evaluate(self, *, y_true: Any, y_pred: Any, label: str | None = None, **kwargs) -> Any:
+    def evaluate(
+        self, *, y_true: Any, y_pred: Any, label: str | None = None, **kwargs
+    ) -> Any:
         if not self.evaluators:
             raise RuntimeError("No evaluators configured.")
         for e in self.evaluators:
@@ -104,14 +118,18 @@ class ModelTrainingRunner:
             t_dir.mkdir(exist_ok=True)
             if callable(getattr(t, "save", None)):
                 t.save(t_dir)
-            manifest["trainers"].append({"index": i, "name": type(t).__name__, "path": t_dir.name})
+            manifest["trainers"].append(
+                {"index": i, "name": type(t).__name__, "path": t_dir.name}
+            )
 
         with open(output_dir / self.ARTIFACTS_FILENAME, "w") as f:
             json.dump(manifest, f, indent=2)
         joblib.dump(self.model_, output_dir / "final_model.joblib")
 
     @classmethod
-    def load(cls, input_dir: Path, *, trainers: Registry, evaluators: Registry) -> ModelTrainingRunner:
+    def load(
+        cls, input_dir: Path, *, trainers: Registry, evaluators: Registry
+    ) -> ModelTrainingRunner:
         input_dir = Path(input_dir)
 
         cfg_path = input_dir / cls.CONFIG_FILENAME
@@ -146,7 +164,9 @@ class ModelTrainingRunner:
                 runner.trainers[i] = loaded
 
         final_path = input_dir / "final_model.joblib"
-        runner.model_ = joblib.load(final_path) if final_path.exists() else runner.trainers[-1]
+        runner.model_ = (
+            joblib.load(final_path) if final_path.exists() else runner.trainers[-1]
+        )
         return runner
 
     def _save_config(self, output_dir: Path) -> None:

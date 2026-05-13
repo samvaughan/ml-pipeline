@@ -5,8 +5,9 @@ description = "Registry-based YAML-configurable ML pipeline infrastructure"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "pandas",
-    "joblib",
+    "pandas>=2.2.3",
+    "joblib>=1.4.2",
+    "pydantic>=2.13.4",
 ]
 
 [build-system]
@@ -15,3 +16,14 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mlpipe"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[dependency-groups]
+dev = [
+    "ipython>=9.13.0",
+    "pre-commit>=4.2.0",
+    "pytest>=9.0.3",
+    "ruff>=0.11.0",
+]

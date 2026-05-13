@@ -14,9 +14,13 @@ class BaseTransformer(ABC):
     def fit(self, df: pd.DataFrame, **kwargs) -> Self: ...
 
     @abstractmethod
-    def transform(self, df: pd.DataFrame, training: bool = False, **kwargs) -> pd.DataFrame: ...
+    def transform(
+        self, df: pd.DataFrame, training: bool = False, **kwargs
+    ) -> pd.DataFrame: ...
 
-    def fit_transform(self, df: pd.DataFrame, training: bool = True, **kwargs) -> pd.DataFrame:
+    def fit_transform(
+        self, df: pd.DataFrame, training: bool = True, **kwargs
+    ) -> pd.DataFrame:
         return self.fit(df, **kwargs).transform(df, training=training, **kwargs)
 
     def save(self, output_dir: Path) -> None:

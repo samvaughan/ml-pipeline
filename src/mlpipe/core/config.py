@@ -1,8 +1,12 @@
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
+
+"""
+CURRENTLY UNUSED - this is a sketch of how we might use pydantic models to define the config schema for a pipeline, and to validate the config when loading it. We can expand this as needed as we add more steps and options to the pipeline. Or maybe leave pipelines as unvalidated?
+"""
 
 
 class ObjectCfg(BaseModel):

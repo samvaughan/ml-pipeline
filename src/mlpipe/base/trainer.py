@@ -7,9 +7,10 @@ import pandas as pd
 
 
 class BaseTrainer(ABC):
-
     @abstractmethod
-    def fit(self, X: pd.DataFrame, y: Any, *, base_artifact: Any = None, **kwargs) -> Any: ...
+    def fit(
+        self, X: pd.DataFrame, y: Any, *, base_artifact: Any = None, **kwargs
+    ) -> Any: ...
 
     @abstractmethod
     def predict(self, X: pd.DataFrame, **kwargs) -> pd.DataFrame: ...
@@ -24,4 +25,6 @@ class BaseTrainer(ABC):
         return joblib.load(Path(input_dir) / f"{cls.__name__}.joblib")
 
     def to_config(self) -> dict[str, Any]:
-        raise NotImplementedError(f"{type(self).__name__} does not implement to_config().")
+        raise NotImplementedError(
+            f"{type(self).__name__} does not implement to_config()."
+        )

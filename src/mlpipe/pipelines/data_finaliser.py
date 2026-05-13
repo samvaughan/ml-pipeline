@@ -70,13 +70,16 @@ class DataFinaliser:
 
     # -------- Config Saving --------
     def to_config(self) -> dict[str, Any]:
+        # Fallback reconstruction is best-effort; prefer building via from_cfg for round-trip safety.
         if self._config is not None:
             return copy.deepcopy(self._config)
 
         cfg: dict[str, Any] = {"transformers": []}
         for t in self.transformers:
             cfg["transformers"].append(
-                t.to_config() if hasattr(t, "to_config") else {"name": type(t).__name__, "kwargs": {}}
+                t.to_config()
+                if hasattr(t, "to_config")
+                else {"name": type(t).__name__, "kwargs": {}}
             )
         return cfg
 
@@ -131,7 +134,9 @@ class DataFinaliser:
         )
         return data.loc[~data[self.id_column].isin(self.excluded_ids)]
 
-    def build_dataset(self, data: pd.DataFrame, selector: Any) -> dict[str, pd.DataFrame]:
+    def build_dataset(
+        self, data: pd.DataFrame, selector: Any
+    ) -> dict[str, pd.DataFrame]:
         selected = selector.select(data)
         return self.split_datasets(selected)
 
@@ -175,7 +180,9 @@ class DataFinaliser:
             )
 
         out: dict[Any, dict[str, pd.DataFrame]] = {}
-        for split_value, split_df in data.groupby(self.train_test_split_column, sort=False):
+        for split_value, split_df in data.groupby(
+            self.train_test_split_column, sort=False
+        ):
             if split_value not in selectors_by_split:
                 raise KeyError(
                     f"No selector provided for split_value={split_value!r}. "
@@ -189,7 +196,9 @@ class DataFinaliser:
 
         return out
 
-    def fit_transform(self, df: pd.DataFrame, training: bool = True) -> dict[Any, dict[str, pd.DataFrame]]:
+    def fit_transform(
+        self, df: pd.DataFrame, training: bool = True
+    ) -> dict[Any, dict[str, pd.DataFrame]]:
         self.fit(df)
         data = self.transform(df, training=training)
         data = self._filter_excluded_rows(data)
