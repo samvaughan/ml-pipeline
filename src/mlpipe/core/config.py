@@ -26,7 +26,6 @@ class LoadDataCfg(BaseModel):
 
 class FeatureEngineeringCfg(BaseModel):
     rows_per_shard: int
-    domain: Literal["racing", "sports"]
 
 
 class StepOptions(BaseModel):

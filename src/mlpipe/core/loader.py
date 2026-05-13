@@ -1,7 +1,7 @@
 import importlib
 import pkgutil
 from types import ModuleType
-from typing import Iterable
+from typing import Iterable, Union
 
 
 def _iter_modules_recursive(pkg: ModuleType) -> Iterable[str]:
@@ -10,17 +10,9 @@ def _iter_modules_recursive(pkg: ModuleType) -> Iterable[str]:
         yield mod.name
 
 
-def autodiscover_plugins():
-    """Import all modules under ltv.plugins (transformers, models, evaluators, etc.)."""
-    import ltv.plugins as base_pkg
-
-    for modname in _iter_modules_recursive(base_pkg):
-        importlib.import_module(modname)
-
-
-def autodiscover_steps():
-    """Import all steps under ltv.steps."""
-    import ltv.steps as base_pkg
-
-    for modname in _iter_modules_recursive(base_pkg):
+def autodiscover(package: Union[str, ModuleType]) -> None:
+    """Import all modules under `package`, triggering any @register decorators."""
+    if isinstance(package, str):
+        package = importlib.import_module(package)
+    for modname in _iter_modules_recursive(package):
         importlib.import_module(modname)
