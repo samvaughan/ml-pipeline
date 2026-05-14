@@ -1,3 +1,5 @@
+[![Tests](https://github.com/samvaughan/ml-pipeline/actions/workflows/tests.yml/badge.svg)](https://github.com/samvaughan/ml-pipeline/actions/workflows/tests.yml)
+
 # ml-pipeline
 
 A registry-based, YAML-configurable framework for building reproducible ML pipelines. It provides the orchestration skeleton; you supply the components.
