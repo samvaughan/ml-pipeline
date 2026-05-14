@@ -1,6 +1,6 @@
 # ml-pipeline
 
-A registry-based, YAML-configurable framework for building reproducible ML pipelines. It provides the orchestration skeleton; projects supply the components.
+A registry-based, YAML-configurable framework for building reproducible ML pipelines. It provides the orchestration skeleton; you supply the components.
 
 ## Concepts
 
@@ -8,7 +8,7 @@ A registry-based, YAML-configurable framework for building reproducible ML pipel
 - Abstract base classes (`BaseTransformer`, `BaseTrainer`)
 - A `Registry` for registering and instantiating components by name
 - Three pipeline stages: `FeatureEngineer`, `DataFinaliser`, `ModelTrainingRunner`
-- YAML-driven config via Pydantic models
+- A way to construct YAML-driven pipelines
 
 **Your project provides:**
 - Custom transformers, trainers, evaluators, cleaners, and selectors
@@ -38,7 +38,7 @@ my-project/
 
 ## Step 1 — Define registries
 
-Create a single `registries.py` in your project:
+Create a single `registries.py` file in your project:
 
 ```python
 from mlpipe.core.registry import Registry
@@ -115,7 +115,7 @@ training:
 
 ## Step 4 — Wire it together
 
-Pass your registries into the `from_cfg` constructors:
+Pass your yaml file to the pipeline constructors:
 
 ```python
 import yaml
@@ -134,9 +134,9 @@ with open("configs/pipeline.yaml") as f:
 
 from myproject.registries import CLEANERS, TRANSFORMERS, TRAINERS, EVALUATORS, SELECTORS
 
-fe = FeatureEngineer.from_cfg(cfg["feature_engineering"], cleaners=CLEANERS, transformers=TRANSFORMERS)
-df_final = DataFinaliser.from_cfg(cfg["data_finaliser"], transformers=TRANSFORMERS, selectors=SELECTORS)
-runner = ModelTrainingRunner.from_cfg(cfg["training"], trainers=TRAINERS, evaluators=EVALUATORS)
+fe = FeatureEngineer.from_cfg(cfg, cleaners=CLEANERS, transformers=TRANSFORMERS)
+df_final = DataFinaliser.from_cfg(cfg, transformers=TRANSFORMERS, selectors=SELECTORS)
+runner = ModelTrainingRunner.from_cfg(cfg, trainers=TRAINERS, evaluators=EVALUATORS)
 ```
 
 ---
@@ -169,7 +169,7 @@ Add ml-pipeline as a dependency in your project's `pyproject.toml`:
 ```toml
 [project]
 dependencies = [
-    "ml-pipeline @ git+https://github.com/your-org/ml-pipeline.git",
+    "ml-pipeline @ git+https://github.com/samvaughan/ml-pipeline.git",
     # or a local editable install:
     # "ml-pipeline @ file:///path/to/ml-pipeline"
 ]
